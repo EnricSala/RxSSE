@@ -1,0 +1,31 @@
+group 'com.saladevs'
+version '0.1.0'
+
+buildscript {
+    ext {
+        kotlin_version = '1.1.51'
+        rxjava_version = '2.1.5'
+        okhttp_version = '3.9.0'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    compile "com.squareup.okhttp3:okhttp:$okhttp_version"
+}
+
+compileKotlin { kotlinOptions.jvmTarget = '1.6' }
+compileTestKotlin { kotlinOptions.jvmTarget = '1.6' }
