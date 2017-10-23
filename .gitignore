@@ -1,16 +1,26 @@
-# Compiled class file
-*.class
+# IntelliJ
+.idea
+*.iml
+*.iws
+*.ipr
 
-# Log file
+# Eclipse
+.classpath
+.project
+.settings
+
+# Build files
+bin/
+gen/
+build/
+out/
+lib/
+libs/
+target/
+*.class
 *.log
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+# Package files
 *.jar
 *.war
 *.ear
@@ -18,5 +28,14 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Gradle files
+.gradle/
+
+# Avoid ignoring Gradle wrapper
+!gradle-wrapper.properties
+!gradle-wrapper.jar
