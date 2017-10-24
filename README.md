@@ -83,7 +83,7 @@ Available on JCenter with:
  * Gradle:
 
 ```groovy
-compile 'com.saladevs:rxsse:0.1.0'
+compile 'com.saladevs:rxsse:0.1.1'
 ```
 
  * Maven:
@@ -92,7 +92,7 @@ compile 'com.saladevs:rxsse:0.1.0'
 <dependency>
   <groupId>com.saladevs</groupId>
   <artifactId>rxsse</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
 </dependency>
 ```
 
