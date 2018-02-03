@@ -27,48 +27,42 @@ Then use it to connect to URLs:
 ```kotlin
 rxsse
     .connectTo("https://localhost/events")
-    .onBackpressureLatest()
-    .subscribeOn(Schedulers.io(), false)
-    .subscribe { Log.i(TAG, "Received: $it") }
+    .subscribeOn(Schedulers.io())
+    .observeOn(Schedulers.newThread())
+    .subscribe { println("Received: $it") }
 ```
 
-Notice that the returned `Flowable` does not define a backpressure strategy.
-You should define a strategy in order to prevent `MissingBackpressure` errors.
-In this case `onBackpressureLatest()` is used, but there are others.
-
-You can also use it with customized requests:
+Or customize the request:
 
 ```kotlin
 val request = Request.Builder().url(myUrl).build()
 rxsse
     .connectTo(request)
-    .onBackpressureLatest()
-    .subscribeOn(Schedulers.io(), false)
-    .subscribe { Log.i(TAG, "Received: $it") }
+    .subscribeOn(Schedulers.io())
+    .observeOn(Schedulers.newThread())
+    .subscribe { println("Received: $it") }
 ```
 
-You can use RxJava's `retry` operators to reconnect if the connection
-is lost or there is an error.
-
-Attempt to reconnect with a fixed timeout:
+You can use RxJava's `retry` operators to reconnect if there is an error.
+For example, try to reconnect after a fixed timeout:
 
 ```kotlin
 rxsse
     .connectTo("https://localhost/events")
-    .onBackpressureLatest()
     .retryWhen { it.flatMap { Flowable.timer(5, TimeUnit.SECONDS) } }
-    .subscribeOn(Schedulers.io(), false)
-    .subscribe { Log.i(TAG, "Received: $it") }
+    .subscribeOn(Schedulers.io())
+    .observeOn(Schedulers.newThread())
+    .subscribe { println("Received: $it") }
 ```
 
-Finally, don't forget to unsubscribe when you are done to close the connection:
+Finally, don't forget to close the connection:
 
 ```kotlin
 val disposable = rxsse
     .connectTo("https://localhost/events")
-    .onBackpressureLatest()
-    .subscribeOn(Schedulers.io(), false)
-    .subscribe { Log.i(TAG, "Received: $it") }
+    .subscribeOn(Schedulers.io())
+    .observeOn(Schedulers.newThread())
+    .subscribe { println("Received: $it") }
 
 // Close the connection
 disposable.dispose()
