@@ -1,10 +1,10 @@
 package com.saladevs.rxsse
 
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.IOException
+import okio.BufferedSource
 
 class RxSSE(private val client: OkHttpClient = OkHttpClient()) {
 
@@ -19,32 +19,33 @@ class RxSSE(private val client: OkHttpClient = OkHttpClient()) {
             .header(ACCEPT_HEADER, SSE_MIME_TYPE).build()
 
     private fun start(request: Request): Flowable<ServerSentEvent> =
-            linesOf(request)
+            execute(request).flatMapPublisher { events(it) }
+
+    private fun execute(request: Request): Single<BufferedSource> =
+            Single.create { emitter ->
+                val response = client.newCall(request)
+                        .also { emitter.setCancellable { it.cancel() } }
+                        .execute()
+                if (response.isSuccessful) {
+                    val source = response.body()!!.source()
+                    emitter.onSuccess(source)
+                } else {
+                    val error = "HTTP ${response.code()}"
+                    emitter.tryOnError(RuntimeException(error))
+                }
+            }
+
+    private fun events(source: BufferedSource): Flowable<ServerSentEvent> =
+            Flowable.using({ source }, { lines(it) }, { it.close() })
                     .scan(EventBuilder()) { builder, next -> builder.accept(next) }
                     .filter { it.isReady }
                     .map { it.build() }
 
-    private fun linesOf(request: Request): Flowable<ServerSentLine> =
-            Flowable.create({ emitter ->
-                val call = client.newCall(request)
-                emitter.setCancellable { call.cancel() }
-                try {
-                    call.execute().use { response ->
-                        if (response.isSuccessful) {
-                            val source = response.body()!!.source()
-                            while (!emitter.isCancelled) {
-                                val line = source.readUtf8LineStrict()
-                                emitter.onNext(ServerSentLine.from(line))
-                            }
-                        } else {
-                            val error = "HTTP ${response.code()}"
-                            emitter.tryOnError(RuntimeException(error))
-                        }
-                    }
-                } catch (ioe: IOException) {
-                    emitter.tryOnError(ioe)
-                }
-            }, BackpressureStrategy.MISSING)
+    private fun lines(source: BufferedSource): Flowable<ServerSentLine> =
+            Flowable.generate { emitter ->
+                val line = source.readUtf8LineStrict()
+                emitter.onNext(ServerSentLine.from(line))
+            }
 
     companion object {
         private const val ACCEPT_HEADER = "Accept"
