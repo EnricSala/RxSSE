@@ -1,5 +1,5 @@
 group 'com.saladevs'
-version '0.1.1'
+version '0.2.0'
 
 buildscript {
     ext {
@@ -54,10 +54,10 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/EnricSala/RxSSE.git'
         version {
-            name = '0.1.1'
-            desc = 'Fix compatibility issue'
+            name = '0.2.0'
+            desc = 'Minor improvements'
             released = new Date()
-            vcsTag = 'v0.1.1'
+            vcsTag = 'v0.2.0'
         }
     }
 }
@@ -69,7 +69,7 @@ publishing {
             artifact sourcesJar
             groupId 'com.saladevs'
             artifactId 'rxsse'
-            version '0.1.1'
+            version '0.2.0'
         }
     }
 }
