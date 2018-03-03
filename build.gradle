@@ -3,10 +3,10 @@ version '0.1.1'
 
 buildscript {
     ext {
-        kotlin_version = '1.1.51'
-        rxjava_version = '2.1.5'
-        okhttp_version = '3.9.0'
-        bintray_version = '1.7.3'
+        kotlin_version = '1.2.30'
+        rxjava_version = '2.1.10'
+        okhttp_version = '3.10.0'
+        bintray_version = '1.8.0'
     }
     repositories {
         mavenCentral()
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
     compile "com.squareup.okhttp3:okhttp:$okhttp_version"
 }
