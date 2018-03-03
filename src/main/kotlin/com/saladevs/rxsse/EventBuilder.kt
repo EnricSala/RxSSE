@@ -13,12 +13,16 @@ internal class EventBuilder(private val lastId: String = DEFAULT_ID,
     }
 
     fun build(): ServerSentEvent =
-            if (isReady) ServerSentEvent(findId(), findEvent(), findData())
-            else throw IllegalStateException("Buffer not ready")
+            if (isReady) ServerSentEvent(findId(), findRetry(), findEvent(), findData())
+            else throw IllegalStateException("builder not ready")
 
     private fun findId(): String = buffer
             .firstOrNull { ServerSentLine.ID == it.field }
             ?.value ?: lastId
+
+    private fun findRetry(): Long = buffer
+            .firstOrNull { ServerSentLine.RETRY == it.field }
+            ?.value?.toLong() ?: DEFAULT_RETRY
 
     private fun findEvent(): String = buffer
             .firstOrNull { ServerSentLine.EVENT == it.field }
@@ -31,6 +35,7 @@ internal class EventBuilder(private val lastId: String = DEFAULT_ID,
     companion object {
         private const val DEFAULT_ID = ""
         private const val DEFAULT_EVENT = ""
+        private const val DEFAULT_RETRY = 3000L
     }
 
 }
