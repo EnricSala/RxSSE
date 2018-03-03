@@ -4,7 +4,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okio.BufferedSource
 
 class RxSSE(private val client: OkHttpClient = OkHttpClient()) {
 
@@ -19,32 +18,23 @@ class RxSSE(private val client: OkHttpClient = OkHttpClient()) {
             .header(ACCEPT_HEADER, SSE_MIME_TYPE).build()
 
     private fun start(request: Request): Flowable<ServerSentEvent> =
-            execute(request).flatMapPublisher { events(it) }
+            execute(request).flatMapPublisher { it.events() }
 
-    private fun execute(request: Request): Single<BufferedSource> =
+    private fun execute(request: Request): Single<Connection> =
             Single.create { emitter ->
-                val response = client.newCall(request)
-                        .also { emitter.setCancellable { it.cancel() } }
-                        .execute()
-                if (response.isSuccessful) {
-                    val source = response.body()!!.source()
-                    emitter.onSuccess(source)
-                } else {
-                    val error = "HTTP ${response.code()}"
-                    emitter.tryOnError(RuntimeException(error))
+                val call = client.newCall(request)
+                emitter.setCancellable { call.cancel() }
+                try {
+                    val response = call.execute()
+                    if (response.isSuccessful) {
+                        emitter.onSuccess(Connection(call, response))
+                    } else {
+                        val error = "HTTP ${response.code()}"
+                        emitter.tryOnError(RuntimeException(error))
+                    }
+                } catch (t: Throwable) {
+                    emitter.tryOnError(t)
                 }
-            }
-
-    private fun events(source: BufferedSource): Flowable<ServerSentEvent> =
-            Flowable.using({ source }, { lines(it) }, { it.close() })
-                    .scan(EventBuilder()) { builder, next -> builder.accept(next) }
-                    .filter { it.isReady }
-                    .map { it.build() }
-
-    private fun lines(source: BufferedSource): Flowable<ServerSentLine> =
-            Flowable.generate { emitter ->
-                val line = source.readUtf8LineStrict()
-                emitter.onNext(ServerSentLine.from(line))
             }
 
     companion object {
