@@ -7,7 +7,7 @@ internal class EventBuilder(private val lastId: String = DEFAULT_ID,
 
     fun accept(line: ServerSentLine): EventBuilder = when {
         line.isBlank && buffer.isEmpty() -> this
-        isReady -> EventBuilder(lastId, listOf(line))
+        isReady -> EventBuilder(findId(), listOf(line))
         else -> EventBuilder(lastId, buffer + line)
     }
 
