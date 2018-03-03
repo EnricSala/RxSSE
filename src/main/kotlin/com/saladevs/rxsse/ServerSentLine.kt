@@ -3,8 +3,7 @@ package com.saladevs.rxsse
 internal data class ServerSentLine(val field: String,
                                    val value: String) {
 
-    val isBlank: Boolean
-        get() = this.field.isBlank() && this.value.isBlank()
+    val isBlank = field.isBlank() && value.isBlank()
 
     companion object {
         private const val DELIMITER = ':'

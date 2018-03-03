@@ -3,8 +3,7 @@ package com.saladevs.rxsse
 internal class EventBuilder(private val lastId: String = DEFAULT_ID,
                             private val buffer: List<ServerSentLine> = listOf()) {
 
-    val isReady: Boolean
-        get() = buffer.size > 1 && buffer.last().isBlank
+    val isReady = buffer.size > 1 && buffer.last().isBlank
 
     fun accept(line: ServerSentLine): EventBuilder = when {
         line.isBlank && buffer.isEmpty() -> this
