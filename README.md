@@ -27,8 +27,6 @@ Then use it to connect to URLs:
 ```kotlin
 rxsse
     .connectTo("https://localhost/events")
-    .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.newThread())
     .subscribe { println("Received: $it") }
 ```
 
@@ -38,8 +36,17 @@ Or customize the request:
 val request = Request.Builder().url(myUrl).build()
 rxsse
     .connectTo(request)
+    .subscribe { println("Received: $it") }
+```
+
+The connection is synchronous by default.
+Use `subscribeOn` / `observeOn` if you want it to run on another thread:
+
+```kotlin
+rxsse
+    .connectTo("https://localhost/events")
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.newThread())
+    .observeOn(AndroidSchedulers.mainThread())
     .subscribe { println("Received: $it") }
 ```
 
@@ -50,8 +57,6 @@ For example, try to reconnect after a fixed timeout:
 rxsse
     .connectTo("https://localhost/events")
     .retryWhen { it.flatMap { Flowable.timer(5, TimeUnit.SECONDS) } }
-    .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.newThread())
     .subscribe { println("Received: $it") }
 ```
 
@@ -61,7 +66,6 @@ Finally, don't forget to close the connection:
 val disposable = rxsse
     .connectTo("https://localhost/events")
     .subscribeOn(Schedulers.io())
-    .observeOn(Schedulers.newThread())
     .subscribe { println("Received: $it") }
 
 // Close the connection
