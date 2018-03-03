@@ -21,7 +21,7 @@ internal class EventBuilder(private val lastId: String = DEFAULT_ID,
 
     private fun findRetry(): Long = buffer
             .firstOrNull { ServerSentLine.RETRY == it.field }
-            ?.value?.toLong() ?: DEFAULT_RETRY
+            ?.value?.trim()?.toLong() ?: DEFAULT_RETRY
 
     private fun findEvent(): String = buffer
             .firstOrNull { ServerSentLine.EVENT == it.field }
